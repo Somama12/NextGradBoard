@@ -1,8 +1,31 @@
 "use client"
 
-import { Calendar, MapPin, Building2, ExternalLink, BookmarkPlus } from "lucide-react"
+import { Calendar, MapPin, Building2, ExternalLink, BookmarkPlus, CheckCircle2 } from "lucide-react"
+import { trackApplication } from "@/app/actions/applications"
+import { useState } from "react"
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
 
-export function ListingCard({ listing }: { listing: any }) {
+export function ListingCard({ listing, isTracked = false }: { listing: any, isTracked?: boolean }) {
+  const { data: session } = useSession()
+  const router = useRouter()
+  const [tracked, setTracked] = useState(isTracked)
+  const [loading, setLoading] = useState(false)
+
+  const handleTrack = async () => {
+    if (!session?.user) {
+      router.push("/login")
+      return
+    }
+    
+    setLoading(true)
+    const res = await trackApplication(listing.id)
+    if (res.success) {
+      setTracked(true)
+    }
+    setLoading(false)
+  }
+
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center p-5 bg-white dark:bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] border border-gray-100 dark:border-gray-700/50 hover:shadow-lg transition-all duration-300 group">
       <div className="space-y-3 w-full">
@@ -39,9 +62,18 @@ export function ListingCard({ listing }: { listing: any }) {
       </div>
       
       <div className="mt-5 md:mt-0 md:ml-6 flex items-center md:flex-row w-full md:w-auto h-full space-x-3">
-        {/* Save button (placeholder functionality for now) */}
-        <button className="p-2.5 text-gray-400 hover:text-blue-600 bg-gray-50 hover:bg-blue-50 dark:bg-gray-700 dark:hover:bg-blue-900/30 rounded-lg transition-colors border border-transparent dark:border-gray-600 box-border">
-          <BookmarkPlus className="w-5 h-5" />
+        {/* Save button */}
+        <button 
+          onClick={handleTrack}
+          disabled={tracked || loading}
+          className={`p-2.5 rounded-lg transition-colors border box-border ${
+            tracked 
+              ? 'text-green-600 bg-green-50 border-green-200 dark:bg-green-900/30 dark:border-green-800' 
+              : 'text-gray-400 hover:text-blue-600 bg-gray-50 hover:bg-blue-50 dark:bg-gray-700 dark:hover:bg-blue-900/30 border-transparent dark:border-gray-600'
+          }`}
+          title={tracked ? "Tracked" : "Track Application"}
+        >
+          {tracked ? <CheckCircle2 className="w-5 h-5" /> : <BookmarkPlus className="w-5 h-5" />}
         </button>
 
         <a 
