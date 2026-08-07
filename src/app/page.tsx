@@ -2,7 +2,7 @@ import { getListings } from "@/app/actions/listings"
 import { ListingCard } from "@/components/ListingCard"
 import Link from "next/link"
 import { Search } from "lucide-react"
-import { auth } from "@/auth"
+import { auth, signOut } from "@/auth"
 
 export default async function Home(props: {
   searchParams: Promise<{ page?: string; q?: string; category?: string; sponsorship?: string }>
@@ -32,7 +32,17 @@ export default async function Home(props: {
           </div>
           <div className="flex items-center gap-4">
             {session?.user ? (
-               <Link href="/dashboard" className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600">Dashboard</Link>
+              <div className="flex items-center gap-4">
+                <Link href="/dashboard" className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600">Dashboard</Link>
+                <form action={async () => {
+                  "use server"
+                  await signOut()
+                }}>
+                  <button type="submit" className="text-sm font-medium px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white rounded-lg transition-colors shadow-sm">
+                    Log out
+                  </button>
+                </form>
+              </div>
             ) : (
               <>
                 <Link href="/login" className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600">Log in</Link>

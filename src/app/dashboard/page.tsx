@@ -1,5 +1,5 @@
 import { getTrackedApplications } from "@/app/actions/applications"
-import { auth } from "@/auth"
+import { auth, signOut } from "@/auth"
 import { ApplicationCard } from "@/components/ApplicationCard"
 import Link from "next/link"
 import { redirect } from "next/navigation"
@@ -31,12 +31,20 @@ export default async function DashboardPage() {
             NextGradBoard
           </Link>
           <div className="flex items-center gap-4">
-            <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-300 hidden sm:inline-block">
               {session.user.name || session.user.email}
             </span>
-            <Link href="/" className="text-sm font-medium px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white rounded-lg transition-colors">
+            <Link href="/" className="text-sm font-medium px-4 py-2 bg-blue-100 dark:bg-blue-900/30 hover:bg-blue-200 dark:hover:bg-blue-800/40 text-blue-700 dark:text-blue-300 rounded-lg transition-colors">
               Find Jobs
             </Link>
+            <form action={async () => {
+              "use server"
+              await signOut({ redirectTo: "/" })
+            }}>
+              <button type="submit" className="text-sm font-medium px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-900 dark:text-white rounded-lg transition-colors shadow-sm">
+                Log out
+              </button>
+            </form>
           </div>
         </div>
       </nav>
