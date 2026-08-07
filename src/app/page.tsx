@@ -33,6 +33,7 @@ export default async function Home(props: {
           <div className="flex items-center gap-4">
             {session?.user ? (
               <div className="flex items-center gap-4">
+                <Link href="/admin/new-listing" className="text-sm font-medium px-4 py-2 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-700 rounded-lg transition-colors">+ Add Listing</Link>
                 <Link href="/dashboard" className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600">Dashboard</Link>
                 <form action={async () => {
                   "use server"
