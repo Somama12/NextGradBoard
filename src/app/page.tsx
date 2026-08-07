@@ -1,69 +1,120 @@
-import Image from "next/image";
+import { getListings } from "@/app/actions/listings"
+import { ListingCard } from "@/components/ListingCard"
+import Link from "next/link"
+import { Search } from "lucide-react"
+import { auth } from "@/auth"
 
-export default function Home() {
+export default async function Home(props: {
+  searchParams: Promise<{ page?: string; q?: string }>
+}) {
+  const searchParams = await props.searchParams
+  const pageParam = Number(searchParams.page) || 1
+  const q = searchParams.q || ""
+  
+  const session = await auth()
+
+  const { listings, totalPages, error, requiresAuth } = await getListings({
+    page: pageParam,
+    searchQuery: q,
+  })
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+    <main className="min-h-screen bg-gray-50/50 dark:bg-gray-950 pb-20">
+      <nav className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2 font-bold text-xl tracking-tight text-gray-900 dark:text-white">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white">N</div>
+            NextGradBoard
+          </div>
+          <div className="flex items-center gap-4">
+            {session?.user ? (
+               <Link href="/dashboard" className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600">Dashboard</Link>
+            ) : (
+              <>
+                <Link href="/login" className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-blue-600">Log in</Link>
+                <Link href="/register" className="text-sm font-medium px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors shadow-sm">Sign up</Link>
+              </>
+            )}
+          </div>
+        </div>
+      </nav>
+
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="text-center space-y-4 mb-12">
+          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+            Find Your Next <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Grad Role</span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            The curated board for 2027 New Grad and Summer 2027 Tech Internships.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
+
+        {/* Search */}
+        <form className="relative max-w-2xl mx-auto mb-10">
+          <div className="relative flex items-center">
+            <Search className="absolute left-4 w-5 h-5 text-gray-400" />
+            <input 
+              type="text"
+              name="q"
+              defaultValue={q}
+              placeholder="Search companies or roles..."
+              className="w-full pl-12 pr-4 py-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-shadow text-gray-900 dark:text-white"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <button type="submit" className="absolute right-3 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-colors shadow-sm">
+              Search
+            </button>
+          </div>
+        </form>
+
+        <div className="space-y-4">
+          {listings.map(listing => (
+            <ListingCard key={listing.id} listing={listing} />
+          ))}
+
+          {listings.length === 0 && !requiresAuth && (
+            <div className="text-center py-20 bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800">
+              <p className="text-gray-500 dark:text-gray-400">No listings found matching your criteria.</p>
+            </div>
+          )}
+
+          {requiresAuth && (
+            <div className="mt-8 text-center p-10 bg-white dark:bg-gray-800/50 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm backdrop-blur-sm">
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">You've reached the free limit.</h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">Create a free account to unlock hundreds of more New Grad and Internship listings.</p>
+              <Link href="/register" className="inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-xl text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md hover:shadow-lg transition-all">
+                Sign Up for Free
+              </Link>
+              <p className="mt-4 text-sm text-gray-500">
+                Already have an account? <Link href="/login" className="font-semibold text-blue-600 hover:text-blue-500">Log in</Link>
+              </p>
+            </div>
+          )}
         </div>
-      </main>
-    </div>
-  );
+
+        {/* Pagination */}
+        {!requiresAuth && totalPages > 1 && (
+          <div className="flex justify-center items-center gap-2 mt-10">
+            {pageParam > 1 && (
+              <Link href={`/?page=${pageParam - 1}${q ? `&q=${q}` : ''}`} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 transition-colors">
+                Previous
+              </Link>
+            )}
+            <span className="text-sm font-medium text-gray-500 dark:text-gray-400 px-4">
+              Page {pageParam} of {totalPages}
+            </span>
+            {pageParam < totalPages && (
+              <Link href={`/?page=${pageParam + 1}${q ? `&q=${q}` : ''}`} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 transition-colors">
+                Next
+              </Link>
+            )}
+            {!session?.user && pageParam === 1 && totalPages > 1 && (
+              <Link href={`/?page=2${q ? `&q=${q}` : ''}`} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
+                Next
+              </Link>
+            )}
+          </div>
+        )}
+      </div>
+    </main>
+  )
 }
