@@ -5,7 +5,17 @@ import { auth } from "@/auth"
 
 const ITEMS_PER_PAGE = 20
 
-export async function getListings({ page = 1, searchQuery = '' }: { page?: number, searchQuery?: string }) {
+export async function getListings({ 
+  page = 1, 
+  searchQuery = '',
+  category,
+  sponsorship
+}: { 
+  page?: number, 
+  searchQuery?: string,
+  category?: string,
+  sponsorship?: string
+}) {
   const session = await auth()
   const skip = (page - 1) * ITEMS_PER_PAGE
 
@@ -21,6 +31,8 @@ export async function getListings({ page = 1, searchQuery = '' }: { page?: numbe
 
   const whereClause = {
     isActive: true,
+    ...(category && category !== 'All' ? { category } : {}),
+    ...(sponsorship && sponsorship !== 'All' ? { sponsorship } : {}),
     ...(searchQuery ? {
       OR: [
         { company: { contains: searchQuery, mode: 'insensitive' as const } },

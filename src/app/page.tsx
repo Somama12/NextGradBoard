@@ -5,17 +5,21 @@ import { Search } from "lucide-react"
 import { auth } from "@/auth"
 
 export default async function Home(props: {
-  searchParams: Promise<{ page?: string; q?: string }>
+  searchParams: Promise<{ page?: string; q?: string; category?: string; sponsorship?: string }>
 }) {
   const searchParams = await props.searchParams
   const pageParam = Number(searchParams.page) || 1
   const q = searchParams.q || ""
+  const categoryParam = searchParams.category || "All"
+  const sponsorshipParam = searchParams.sponsorship || "All"
   
   const session = await auth()
 
   const { listings, totalPages, error, requiresAuth } = await getListings({
     page: pageParam,
     searchQuery: q,
+    category: categoryParam,
+    sponsorship: sponsorshipParam
   })
 
   return (
@@ -49,8 +53,8 @@ export default async function Home(props: {
           </p>
         </div>
 
-        {/* Search */}
-        <form className="relative max-w-2xl mx-auto mb-10">
+        {/* Search & Filters */}
+        <form className="max-w-3xl mx-auto mb-10 space-y-4">
           <div className="relative flex items-center">
             <Search className="absolute left-4 w-5 h-5 text-gray-400" />
             <input 
@@ -60,8 +64,23 @@ export default async function Home(props: {
               placeholder="Search companies or roles..."
               className="w-full pl-12 pr-4 py-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl shadow-sm focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition-shadow text-gray-900 dark:text-white"
             />
-            <button type="submit" className="absolute right-3 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-colors shadow-sm">
-              Search
+          </div>
+          <div className="flex gap-4 items-center justify-between">
+            <div className="flex gap-4">
+              <select name="category" defaultValue={categoryParam} className="px-4 py-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 outline-none focus:ring-2 focus:ring-blue-600 cursor-pointer">
+                <option value="All">All Categories</option>
+                <option value="Internship">Internship</option>
+                <option value="New Grad">New Grad</option>
+              </select>
+              <select name="sponsorship" defaultValue={sponsorshipParam} className="px-4 py-3 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 outline-none focus:ring-2 focus:ring-blue-600 cursor-pointer">
+                <option value="All">Any Sponsorship</option>
+                <option value="Available">H1B Available</option>
+                <option value="Unavailable">H1B Unavailable</option>
+                <option value="Unknown">Unknown</option>
+              </select>
+            </div>
+            <button type="submit" className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-colors shadow-sm whitespace-nowrap">
+              Apply Filters
             </button>
           </div>
         </form>
@@ -95,7 +114,7 @@ export default async function Home(props: {
         {!requiresAuth && totalPages > 1 && (
           <div className="flex justify-center items-center gap-2 mt-10">
             {pageParam > 1 && (
-              <Link href={`/?page=${pageParam - 1}${q ? `&q=${q}` : ''}`} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 transition-colors">
+              <Link href={`/?page=${pageParam - 1}${q ? `&q=${q}` : ''}${categoryParam !== 'All' ? `&category=${categoryParam}` : ''}${sponsorshipParam !== 'All' ? `&sponsorship=${sponsorshipParam}` : ''}`} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 transition-colors">
                 Previous
               </Link>
             )}
@@ -103,12 +122,12 @@ export default async function Home(props: {
               Page {pageParam} of {totalPages}
             </span>
             {pageParam < totalPages && (
-              <Link href={`/?page=${pageParam + 1}${q ? `&q=${q}` : ''}`} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 transition-colors">
+              <Link href={`/?page=${pageParam + 1}${q ? `&q=${q}` : ''}${categoryParam !== 'All' ? `&category=${categoryParam}` : ''}${sponsorshipParam !== 'All' ? `&sponsorship=${sponsorshipParam}` : ''}`} className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 transition-colors">
                 Next
               </Link>
             )}
             {!session?.user && pageParam === 1 && totalPages > 1 && (
-              <Link href={`/?page=2${q ? `&q=${q}` : ''}`} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
+              <Link href={`/?page=2${q ? `&q=${q}` : ''}${categoryParam !== 'All' ? `&category=${categoryParam}` : ''}${sponsorshipParam !== 'All' ? `&sponsorship=${sponsorshipParam}` : ''}`} className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
                 Next
               </Link>
             )}

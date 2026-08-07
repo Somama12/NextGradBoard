@@ -58,6 +58,15 @@ export function ListingCard({ listing, isTracked = false }: { listing: any, isTr
               }) : 'Recently'}
             </span>
           </div>
+           {listing.sponsorship && (
+            <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold ${
+               listing.sponsorship === 'Available' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+               listing.sponsorship === 'Unavailable' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
+               'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-400'
+            }`}>
+              H1B: {listing.sponsorship}
+            </div>
+          )}
         </div>
       </div>
       
