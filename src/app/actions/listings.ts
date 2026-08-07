@@ -35,8 +35,8 @@ export async function getListings({
     ...(sponsorship && sponsorship !== 'All' ? { sponsorship } : {}),
     ...(searchQuery ? {
       OR: [
-        { company: { contains: searchQuery, mode: 'insensitive' as const } },
-        { title: { contains: searchQuery, mode: 'insensitive' as const } },
+        { company: { contains: searchQuery } },
+        { title: { contains: searchQuery } },
       ]
     } : {})
   }

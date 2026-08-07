@@ -53,8 +53,8 @@ export function ListingCard({ listing, isTracked = false }: { listing: any, isTr
           <div className="flex items-center gap-1.5">
             <Calendar className="w-4 h-4" />
             <span>
-              {listing.datePosted ? new Date(listing.datePosted).toLocaleDateString(undefined, {
-                month: 'short', day: 'numeric'
+              {listing.datePosted ? new Date(listing.datePosted).toLocaleDateString('en-US', {
+                month: 'short', day: 'numeric', timeZone: 'UTC'
               }) : 'Recently'}
             </span>
           </div>
